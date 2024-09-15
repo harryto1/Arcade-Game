@@ -1,5 +1,6 @@
-import pygame, sys, random
+from distutils.command.build import build
 
+import pygame, sys, random
 
 def ball_movement():
     """
@@ -22,12 +23,15 @@ def ball_movement():
         if abs(ball.bottom - player.top) < 10:  # Check if ball hits the top of the paddle
             score += 1  # Increase player score
             ball_speed_y *= -1  # Reverse ball's vertical direction
-            ball_speed_y *= round(random.uniform(1,1.115), 3) # random number to be less predictable
-            ball_speed_x *= round(random.uniform(1,1.115), 3) # random number to be less predictable
-    if ball.colliderect(obstacle):
-        if abs(ball.bottom - obstacle.top) < 10:
-            score += 1
-            ball_speed_y *= -1
+            ball_speed_y *= round(random.uniform(1,1.000005), 3) # random number to be less predictable
+            ball_speed_x *= round(random.uniform(1,1.000005), 3) # random number to be less predictable
+    for obstacle in obstacles:
+        if ball.colliderect(obstacle):
+            if abs(ball.bottom - obstacle.bottom) < 10:
+                score += 1
+                ball_speed_y *= -1
+                obstacles.remove(obstacle)
+                pygame.display.update()
     # Ball collision with top boundary
     if ball.top <= 0:
         ball_speed_y *= -1  # Reverse ball's vertical direction
@@ -44,40 +48,11 @@ def ball_movement():
 
 def invert_colors():
     global player_text, super_score_text, high_score_text
-    if score < 5:
-        pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
-        player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
-        super_score_text = super_score_font.render(f'{super_score}', False, light_pink)
-        high_score_text = basic_font.render(f'{high_score}', False, dark_grey)
-
-    elif 5 <= score < 10:
-        screen.fill(light_grey)
-        player.clamp(pygame.draw.rect(screen, black, player))
-        player_text = basic_font.render(f'{score}', False, black)
-        super_score_text = super_score_font.render(f'{super_score}', False, light_pink)
-        high_score_text = basic_font.render(f'{high_score}', False, dark_grey)
-
-    elif 10 <= score < 20:
-        screen.fill(bg_color)
-        pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
-        player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
-        super_score_text = super_score_font.render(f'{super_score}', False, light_pink)
-        high_score_text = basic_font.render(f'{high_score}', False, dark_grey)
-
-    elif score > 20 and (score/10) % 2 != 0:
-        screen.fill(light_grey)
-        player.clamp(pygame.draw.rect(screen, black, player))
-        player_text = basic_font.render(f'{score}', False, black)
-        super_score_text = super_score_font.render(f'{super_score}', False, light_pink)
-        high_score_text = basic_font.render(f'{high_score}', False, dark_grey)
-
-    elif score > 20 and (score/10) % 2 == 0:
-        screen.fill(bg_color)
-        pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
-        player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
-        super_score_text = super_score_font.render(f'{super_score}', False, light_pink)
-        high_score_text = basic_font.render(f'{high_score}', False, dark_grey)
-
+    pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
+    player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
+    super_score_text = super_score_font.render(f'{super_score}', False, light_pink)
+    high_score_text = basic_font.render(f'{high_score}', False, dark_grey)
+    
 def player_movement():
     """
     Handles the movement of the player paddle, keeping it within the screen boundaries.
@@ -89,6 +64,30 @@ def player_movement():
         player.left = 0
     if player.right >= screen_width:
         player.right = screen_width
+
+def build_obstacles():
+    global obstacles, temp_var
+    n = 120
+    temp_var = 0
+    obstacles.clear()  # Clear existing obstacles
+    i = 0
+    for y in range(1, 7):
+        for x in range(1, 850):
+            if y % 2 == 0:
+                if x == 75 or x == temp_var + 95:
+                    temp_obstacle = pygame.Rect(x, n, 75, 15)
+                    obstacles.append(temp_obstacle)
+                    pygame.draw.rect(screen, green, temp_obstacle)
+                    temp_var = x
+                    i += 1
+            else:
+                if x == 30 or x == temp_var + 95:
+                    temp_obstacle = pygame.Rect(x, n, 75, 15)
+                    obstacles.append(temp_obstacle)
+                    pygame.draw.rect(screen, green, temp_obstacle)
+                    temp_var = x
+                    i += 1
+        n += 20
 
 
 def restart():
@@ -108,6 +107,7 @@ def restart():
     score = 0  # Reset player score
     super_score = 0 # Reset super score
     started = 0 # Reset started
+    build_obstacles()
 
 # General setup
 pygame.mixer.pre_init(44100, -16, 1, 1024)
@@ -134,7 +134,6 @@ bg_color = pygame.Color('grey12')
 # Game Rectangles (ball and player paddle)
 ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 24, 24)  # Ball (centered)
 player = pygame.Rect(screen_width/2 - 45, screen_height - 20, 100, 15)  # Player paddle
-obstacle = pygame.Rect(screen_width / 2 - 45, screen_height - 20, 75, 15) # Obstacle Rectangle
 
 # Game Variables
 ball_speed_x = 0
@@ -142,6 +141,7 @@ ball_speed_y = 0
 player_speed = 0
 started = 0
 high_score = 0
+obstacles = []
 
 # Music Files
 
@@ -154,6 +154,7 @@ super_score_font = pygame.font.Font('freesansbold.ttf', 32)
 start = False # Indicates if the game has started
 
 # Main game loop
+build_obstacles()
 while True:
     # Event handling
     name = "Harry Ruiz"
@@ -184,34 +185,12 @@ while True:
     ball_movement()
     player_movement()
     temp_var = 0
-    n: int = 120   # Visuals
+    # Visuals
     screen.fill(bg_color)  # Clear screen with background color
     invert_colors()
-    for y in range(1, 7):
-        for x in range(1, 850):
-            if y %2 == 0:
-                if x == 75:
-                    obstacle.x = x
-                    obstacle.y = n
-                    pygame.draw.rect(screen, light_grey, obstacle)
-                    temp_var = x
-                if x == temp_var + 95:
-                    obstacle.x = x
-                    obstacle.y = n
-                    pygame.draw.rect(screen, light_grey, obstacle)
-                    temp_var = x
-            elif y % 2 != 0:
-                if x == 30:
-                    obstacle.x = x
-                    obstacle.y = n
-                    pygame.draw.rect(screen, light_grey, obstacle)
-                    temp_var = x
-                if x == temp_var + 95:
-                    obstacle.x = x
-                    obstacle.y = n
-                    pygame.draw.rect(screen, light_grey, obstacle)
-                    temp_var = x
-        n = n + 20
+    i=0
+    for obstacle in obstacles:
+        pygame.draw.rect(screen, green, obstacle)
     pygame.draw.ellipse(screen, red, ball)  # Draw ball
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
     screen.blit(super_score_text, (screen_width - 50, 10))
