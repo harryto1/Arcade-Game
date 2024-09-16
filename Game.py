@@ -24,13 +24,22 @@ def ball_movement():
             ball_speed_x *= round(random.uniform(1,1.0005), 10) # random number to be less predictable
     for obstacle in obstacles:
         if ball.colliderect(obstacle):
-            if abs(ball.bottom - obstacle.bottom) < 10:
-                score += 1
-                ball_speed_y *= -1
-                ball_speed_y *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
-                ball_speed_x *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
-                obstacles.remove(obstacle)
-                pygame.display.update()
+            if level == 1:
+                if abs(ball.bottom - obstacle.bottom) < 10:
+                    score += 1
+                    ball_speed_y *= -1
+                    ball_speed_y *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
+                    ball_speed_x *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
+                    obstacles.remove(obstacle)
+                    pygame.display.update()
+            elif level == 2:
+                if abs(ball.bottom - obstacle.bottom) < 10:
+                    score += 1
+                    ball_speed_y *= -1
+                    ball_speed_y *= round(random.uniform(1, 1.05), 10)  # random number to be less predictable
+                    ball_speed_x *= round(random.uniform(1, 1.05), 10)  # random number to be less predictable
+                    obstacles.remove(obstacle)
+                    pygame.display.update()
     # Ball collision with top boundary
     if ball.top <= 0:
         ball_speed_y *= -1  # Reverse ball's vertical direction
@@ -84,6 +93,58 @@ def build_obstacles():
                     i += 1
         n += 20
 
+def main_loop_level1():
+    global player_speed, started, start
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # Quit the game
+            pygame.quit()
+            sys.exit()
+        # KEY DOWN
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                player_speed -= 12 # Move paddle left
+            if event.key == pygame.K_RIGHT:
+                player_speed += 12  # Move paddle right
+            if event.key == pygame.K_SPACE:
+                if started == 0:
+                    start = True  # Start the ball movement
+                    started = 1
+            if event.key == pygame.K_ESCAPE: # Quit the game if ESC key is pressed
+                pygame.quit()
+                sys.exit()
+        # KEY UP
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                player_speed += 12  # Stop moving left
+            if event.key == pygame.K_RIGHT:
+                player_speed -= 12  # Stop moving right
+
+def main_loop_level2():
+    global player_speed, started, start
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # Quit the game
+            pygame.quit()
+            sys.exit()
+        # KEY DOWN
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                player_speed -= 16 # Move paddle left
+            if event.key == pygame.K_RIGHT:
+                player_speed += 16  # Move paddle right
+            if event.key == pygame.K_SPACE:
+                if started == 0:
+                    start = True  # Start the ball movement
+                    started = 1
+            if event.key == pygame.K_ESCAPE: # Quit the game if ESC key is pressed
+                pygame.quit()
+                sys.exit()
+        # KEY UP
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                player_speed += 16  # Stop moving left
+            if event.key == pygame.K_RIGHT:
+                player_speed -= 16  # Stop moving right
+
 
 def restart():
     """
@@ -96,6 +157,15 @@ def restart():
     screen.blit(restart_text, restart_text_rect)
     pygame.display.update()
     pygame.font.Font.set_bold(basic_font, False)
+    pygame.time.wait(750)
+    ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
+    ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
+    score = 0  # Reset player score
+    started = 0 # Reset started
+    build_obstacles()
+
+def next_level():
+    global ball_speed_x, ball_speed_y, score, started
     pygame.time.wait(750)
     ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
@@ -134,6 +204,7 @@ ball_speed_x = 0
 ball_speed_y = 0
 player_speed = 0
 started = 0
+level = 1
 obstacles = []
 
 # Music Files
@@ -151,29 +222,10 @@ build_obstacles()
 while True:
     # Event handling
     name = "Harry Ruiz"
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:  # Quit the game
-            pygame.quit()
-            sys.exit()
-        # KEY DOWN
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player_speed -= 12 # Move paddle left
-            if event.key == pygame.K_RIGHT:
-                player_speed += 12  # Move paddle right
-            if event.key == pygame.K_SPACE:
-                if started == 0:
-                    start = True  # Start the ball movement
-                    started = 1
-            if event.key == pygame.K_ESCAPE: # Quit the game if ESC key is pressed
-                pygame.quit()
-                sys.exit()
-        # KEY UP
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
-                player_speed += 12  # Stop moving left
-            if event.key == pygame.K_RIGHT:
-                player_speed -= 12  # Stop moving right
+    if level == 1:
+        main_loop_level1()
+    elif level == 2:
+        main_loop_level2()
     # Game Logic
     ball_movement()
     player_movement()
@@ -185,12 +237,14 @@ while True:
     player_paddle()
     i=0
     if len(obstacles) == 0:
-        you_win_text = basic_font.render('You Win!', False, light_grey)  # You Died Text
-        you_win_text_rect = you_win_text.get_rect(center=(screen_width / 2, screen_height / 2))
-        screen.blit(you_win_text, you_win_text_rect)
-        pygame.display.update()
-        pygame.time.wait(2000)
-        restart()
+        if level == 1:
+            you_win_text = basic_font.render('Level 1 Completed!', False, light_grey)  # You Died Text
+            you_win_text_rect = you_win_text.get_rect(center=(screen_width / 2, screen_height / 2))
+            screen.blit(you_win_text, you_win_text_rect)
+            pygame.display.update()
+            pygame.time.wait(2000)
+            level = 2
+            next_level()
 
     pygame.draw.ellipse(screen, red, ball)  # Draw ball
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
