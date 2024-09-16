@@ -29,7 +29,6 @@ def ball_movement():
                 ball_speed_y *= -1
                 ball_speed_y *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
                 ball_speed_x *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
-                print(ball_speed_x, ball_speed_y)
                 obstacles.remove(obstacle)
                 pygame.display.update()
     # Ball collision with top boundary
