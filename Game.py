@@ -144,8 +144,10 @@ basic_font = pygame.font.Font('freesansbold.ttf', 32)  # Font for displaying sco
 
 start = False # Indicates if the game has started
 
-# Main game loop
+#Build Obstacles
 build_obstacles()
+
+# Main game loop
 while True:
     # Event handling
     name = "Harry Ruiz"
@@ -178,10 +180,10 @@ while True:
     temp_var = 0
     # Visuals
     screen.fill(bg_color)  # Clear screen with background color
-    player_paddle()
-    i=0
     for obstacle in obstacles:
         pygame.draw.rect(screen, green, obstacle)
+    player_paddle()
+    i=0
     if len(obstacles) == 0:
         you_win_text = basic_font.render('You Win!', False, light_grey)  # You Died Text
         you_win_text_rect = you_win_text.get_rect(center=(screen_width / 2, screen_height / 2))
