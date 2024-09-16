@@ -20,15 +20,16 @@ def ball_movement():
         if abs(ball.bottom - player.top) < 10:  # Check if ball hits the top of the paddle
             score += 1  # Increase player score
             ball_speed_y *= -1  # Reverse ball's vertical direction
-            ball_speed_y *= round(random.uniform(1,1.0005), 3) # random number to be less predictable
-            ball_speed_x *= round(random.uniform(1,1.0005), 3) # random number to be less predictable
+            ball_speed_y *= round(random.uniform(1,1.0005), 10) # random number to be less predictable
+            ball_speed_x *= round(random.uniform(1,1.0005), 10) # random number to be less predictable
     for obstacle in obstacles:
         if ball.colliderect(obstacle):
             if abs(ball.bottom - obstacle.bottom) < 10:
                 score += 1
                 ball_speed_y *= -1
-                ball_speed_y *= round(random.uniform(1, 1.0005), 3)  # random number to be less predictable
-                ball_speed_x *= round(random.uniform(1, 1.0005), 3)  # random number to be less predictable
+                ball_speed_y *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
+                ball_speed_x *= round(random.uniform(1, 1.0005), 10)  # random number to be less predictable
+                print(ball_speed_x, ball_speed_y)
                 obstacles.remove(obstacle)
                 pygame.display.update()
     # Ball collision with top boundary
