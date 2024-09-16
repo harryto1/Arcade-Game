@@ -1,13 +1,10 @@
-from distutils.command.build import build
-
 import pygame, sys, random
 
 def ball_movement():
     """
     Handles the movement of the ball and collision detection with the player and screen boundaries.
     """
-    global ball_speed_x, ball_speed_y, score, start, super_score, high_score
-
+    global ball_speed_x, ball_speed_y, score, start
     # Move the ball
     ball.x += ball_speed_x
     ball.y += ball_speed_y
@@ -23,13 +20,15 @@ def ball_movement():
         if abs(ball.bottom - player.top) < 10:  # Check if ball hits the top of the paddle
             score += 1  # Increase player score
             ball_speed_y *= -1  # Reverse ball's vertical direction
-            ball_speed_y *= round(random.uniform(1,1.000005), 3) # random number to be less predictable
-            ball_speed_x *= round(random.uniform(1,1.000005), 3) # random number to be less predictable
+            ball_speed_y *= round(random.uniform(1,1.0005), 3) # random number to be less predictable
+            ball_speed_x *= round(random.uniform(1,1.0005), 3) # random number to be less predictable
     for obstacle in obstacles:
         if ball.colliderect(obstacle):
             if abs(ball.bottom - obstacle.bottom) < 10:
                 score += 1
                 ball_speed_y *= -1
+                ball_speed_y *= round(random.uniform(1, 1.0005), 3)  # random number to be less predictable
+                ball_speed_x *= round(random.uniform(1, 1.0005), 3)  # random number to be less predictable
                 obstacles.remove(obstacle)
                 pygame.display.update()
     # Ball collision with top boundary
@@ -42,16 +41,12 @@ def ball_movement():
 
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
-        if score > high_score:
-            high_score = score
         restart()  # Reset the game
 
-def invert_colors():
-    global player_text, super_score_text, high_score_text
+def player_paddle():
+    global player_text
     pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
-    super_score_text = super_score_font.render(f'{super_score}', False, light_pink)
-    high_score_text = basic_font.render(f'{high_score}', False, dark_grey)
     
 def player_movement():
     """
@@ -67,21 +62,21 @@ def player_movement():
 
 def build_obstacles():
     global obstacles, temp_var
-    n = 120
+    n = 75
     temp_var = 0
     obstacles.clear()  # Clear existing obstacles
     i = 0
-    for y in range(1, 7):
+    for y in range(1, 9):
         for x in range(1, 850):
             if y % 2 == 0:
-                if x == 75 or x == temp_var + 95:
+                if x == 55 or x == temp_var + 95:
                     temp_obstacle = pygame.Rect(x, n, 75, 15)
                     obstacles.append(temp_obstacle)
                     pygame.draw.rect(screen, green, temp_obstacle)
                     temp_var = x
                     i += 1
             else:
-                if x == 30 or x == temp_var + 95:
+                if x == 15 or x == temp_var + 95:
                     temp_obstacle = pygame.Rect(x, n, 75, 15)
                     obstacles.append(temp_obstacle)
                     pygame.draw.rect(screen, green, temp_obstacle)
@@ -94,7 +89,7 @@ def restart():
     """
     Resets the ball and player scores to the initial state.
     """
-    global ball_speed_x, ball_speed_y, score, started, super_score
+    global ball_speed_x, ball_speed_y, score, started
     pygame.font.Font.set_bold(basic_font, True)
     restart_text = basic_font.render('You Died', False, red)  # You Died Text
     restart_text_rect = restart_text.get_rect(center=(screen_width / 2, screen_height / 2))
@@ -105,7 +100,6 @@ def restart():
     ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
     score = 0  # Reset player score
-    super_score = 0 # Reset super score
     started = 0 # Reset started
     build_obstacles()
 
@@ -140,16 +134,13 @@ ball_speed_x = 0
 ball_speed_y = 0
 player_speed = 0
 started = 0
-high_score = 0
 obstacles = []
 
 # Music Files
 
 # Score Text setup
 score = 0
-super_score = 0
 basic_font = pygame.font.Font('freesansbold.ttf', 32)  # Font for displaying score
-super_score_font = pygame.font.Font('freesansbold.ttf', 32)
 
 start = False # Indicates if the game has started
 
@@ -187,14 +178,20 @@ while True:
     temp_var = 0
     # Visuals
     screen.fill(bg_color)  # Clear screen with background color
-    invert_colors()
+    player_paddle()
     i=0
     for obstacle in obstacles:
         pygame.draw.rect(screen, green, obstacle)
+    if len(obstacles) == 0:
+        you_win_text = basic_font.render('You Win!', False, light_grey)  # You Died Text
+        you_win_text_rect = you_win_text.get_rect(center=(screen_width / 2, screen_height / 2))
+        screen.blit(you_win_text, you_win_text_rect)
+        pygame.display.update()
+        pygame.time.wait(2000)
+        restart()
+
     pygame.draw.ellipse(screen, red, ball)  # Draw ball
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
-    screen.blit(super_score_text, (screen_width - 50, 10))
-    screen.blit(high_score_text, (25, 10))
 
     # Update display
     pygame.display.flip()
