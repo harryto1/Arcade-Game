@@ -86,7 +86,7 @@ def build_obstacles():
                         case 1:
                             pygame.draw.rect(screen, green, temp_obstacle)
                         case 2:
-                            pygame.draw.rect(screen, yellow, temp_obstacle) # This doesnt work idk why
+                            pygame.draw.rect(screen, yellow, temp_obstacle)
                         case 3:
                             pygame.draw.rect(screen, red, temp_obstacle)
                     temp_var = x
@@ -246,7 +246,13 @@ while True:
     # Visuals
     screen.fill(bg_color)  # Clear screen with background color
     for obstacle in obstacles:
-        pygame.draw.rect(screen, green, obstacle)
+        match level:
+            case 1:
+                pygame.draw.rect(screen, green, obstacle)
+            case 2:
+                pygame.draw.rect(screen, yellow, obstacle)
+            case 3:
+                pygame.draw.rect(screen, red, obstacle)
     player_paddle()
     i=0
     if len(obstacles) == 0:
