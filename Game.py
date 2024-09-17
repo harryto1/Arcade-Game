@@ -36,8 +36,16 @@ def ball_movement():
                 if abs(ball.bottom - obstacle.bottom) < 10:
                     score += 1
                     ball_speed_y *= -1
-                    ball_speed_y *= round(random.uniform(1, 1.009), 10)  # random number to be less predictable
-                    ball_speed_x *= round(random.uniform(1, 1.009), 10)  # random number to be less predictable
+                    ball_speed_y *= round(random.uniform(1, 1.015), 10)  # random number to be less predictable
+                    ball_speed_x *= round(random.uniform(1, 1.015), 10)  # random number to be less predictable
+                    obstacles.remove(obstacle)
+                    pygame.display.update()
+            elif level == 3:
+                if abs(ball.bottom - obstacle.bottom) < 10:
+                    score += 1
+                    ball_speed_y *= -1
+                    ball_speed_y *= round(random.uniform(1, 1.025), 10)  # random number to be less predictable
+                    ball_speed_x *= round(random.uniform(1, 1.025), 10)  # random number to be less predictable
                     obstacles.remove(obstacle)
                     pygame.display.update()
     # Ball collision with top boundary
@@ -88,7 +96,7 @@ def build_obstacles():
                         case 2:
                             pygame.draw.rect(screen, yellow, temp_obstacle)
                         case 3:
-                            pygame.draw.rect(screen, red, temp_obstacle)
+                            pygame.draw.rect(screen, dark_red, temp_obstacle)
                     temp_var = x
                     i += 1
             else:
@@ -101,7 +109,7 @@ def build_obstacles():
                         case 2:
                             pygame.draw.rect(screen, yellow, temp_obstacle)
                         case 3:
-                            pygame.draw.rect(screen, red, temp_obstacle)
+                            pygame.draw.rect(screen, dark_red, temp_obstacle)
                     temp_var = x
                     i += 1
         n += 20
@@ -141,6 +149,32 @@ def main_loop_level2():
         # KEY DOWN
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
+                player_speed -= 14 # Move paddle left
+            if event.key == pygame.K_RIGHT:
+                player_speed += 14  # Move paddle right
+            if event.key == pygame.K_SPACE:
+                if started == 0:
+                    start = True  # Start the ball movement
+                    started = 1
+            if event.key == pygame.K_ESCAPE: # Quit the game if ESC key is pressed
+                pygame.quit()
+                sys.exit()
+        # KEY UP
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                player_speed += 14  # Stop moving left
+            if event.key == pygame.K_RIGHT:
+                player_speed -= 14  # Stop moving right
+
+def main_loop_level3():
+    global player_speed, started, start
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # Quit the game
+            pygame.quit()
+            sys.exit()
+        # KEY DOWN
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
                 player_speed -= 16 # Move paddle left
             if event.key == pygame.K_RIGHT:
                 player_speed += 16  # Move paddle right
@@ -157,7 +191,6 @@ def main_loop_level2():
                 player_speed += 16  # Stop moving left
             if event.key == pygame.K_RIGHT:
                 player_speed -= 16  # Stop moving right
-
 
 def restart():
     """
@@ -203,6 +236,7 @@ dark_grey = (100, 100, 100)
 light_pink = (255, 179, 222)
 blue = (0, 0, 255)
 red = (255, 0, 0)
+dark_red = (139, 0, 0)
 black = (0, 0, 0)
 green = (0, 255, 0)
 yellow = (255, 255, 0)
@@ -239,6 +273,8 @@ while True:
         main_loop_level1()
     elif level == 2:
         main_loop_level2()
+    elif level == 3:
+        main_loop_level3()
     # Game Logic
     ball_movement()
     player_movement()
@@ -252,7 +288,7 @@ while True:
             case 2:
                 pygame.draw.rect(screen, yellow, obstacle)
             case 3:
-                pygame.draw.rect(screen, red, obstacle)
+                pygame.draw.rect(screen, dark_red, obstacle)
     player_paddle()
     i=0
     if len(obstacles) == 0:
@@ -263,6 +299,14 @@ while True:
             pygame.display.update()
             pygame.time.wait(2000)
             level = 2
+            next_level()
+        elif level == 2:
+            you_win_text = basic_font.render('Level 2 Completed!', False, light_grey)  # You Died Text
+            you_win_text_rect = you_win_text.get_rect(center=(screen_width / 2, screen_height / 2))
+            screen.blit(you_win_text, you_win_text_rect)
+            pygame.display.update()
+            pygame.time.wait(2000)
+            level = 3
             next_level()
 
     pygame.draw.ellipse(screen, red, ball)  # Draw ball
