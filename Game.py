@@ -36,8 +36,8 @@ def ball_movement():
                 if abs(ball.bottom - obstacle.bottom) < 10:
                     score += 1
                     ball_speed_y *= -1
-                    ball_speed_y *= round(random.uniform(1, 1.05), 10)  # random number to be less predictable
-                    ball_speed_x *= round(random.uniform(1, 1.05), 10)  # random number to be less predictable
+                    ball_speed_y *= round(random.uniform(1, 1.009), 10)  # random number to be less predictable
+                    ball_speed_x *= round(random.uniform(1, 1.009), 10)  # random number to be less predictable
                     obstacles.remove(obstacle)
                     pygame.display.update()
     # Ball collision with top boundary
@@ -53,9 +53,10 @@ def ball_movement():
         restart()  # Reset the game
 
 def player_paddle():
-    global player_text
+    global player_text, level_text
     pygame.draw.rect(screen, light_grey, player)  # Draw player paddle
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
+    level_text = basic_font.render(f'Level {level}', False, dark_grey)
     
 def player_movement():
     """
@@ -81,14 +82,26 @@ def build_obstacles():
                 if x == 55 or x == temp_var + 95:
                     temp_obstacle = pygame.Rect(x, n, 75, 15)
                     obstacles.append(temp_obstacle)
-                    pygame.draw.rect(screen, green, temp_obstacle)
+                    match level:
+                        case 1:
+                            pygame.draw.rect(screen, green, temp_obstacle)
+                        case 2:
+                            pygame.draw.rect(screen, yellow, temp_obstacle) # This doesnt work idk why
+                        case 3:
+                            pygame.draw.rect(screen, red, temp_obstacle)
                     temp_var = x
                     i += 1
             else:
                 if x == 15 or x == temp_var + 95:
                     temp_obstacle = pygame.Rect(x, n, 75, 15)
                     obstacles.append(temp_obstacle)
-                    pygame.draw.rect(screen, green, temp_obstacle)
+                    match level:
+                        case 1:
+                            pygame.draw.rect(screen, green, temp_obstacle)
+                        case 2:
+                            pygame.draw.rect(screen, yellow, temp_obstacle)
+                        case 3:
+                            pygame.draw.rect(screen, red, temp_obstacle)
                     temp_var = x
                     i += 1
         n += 20
@@ -248,6 +261,7 @@ while True:
 
     pygame.draw.ellipse(screen, red, ball)  # Draw ball
     screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
+    screen.blit(level_text, (15, 10)) # Display level on screen
 
     # Update display
     pygame.display.flip()
