@@ -230,7 +230,7 @@ clock = pygame.time.Clock()
 screen_width = 900 # Screen width (can be adjusted)
 screen_height = 600  # Screen height (can be adjusted)
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Pong')  # Set window title
+pygame.display.set_caption('Breakout')  # Set window title
 
 # Colors
 light_grey = (200, 200, 200)
