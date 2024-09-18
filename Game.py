@@ -201,6 +201,8 @@ def restart():
     restart_text = basic_font.render('You Died', False, red)  # You Died Text
     restart_text_rect = restart_text.get_rect(center=(screen_width / 2, screen_height / 2))
     screen.blit(restart_text, restart_text_rect)
+    pygame.mixer.music.load("./assets/hitHurt.wav")
+    pygame.mixer.music.play()
     pygame.display.update()
     pygame.font.Font.set_bold(basic_font, False)
     pygame.time.wait(750)
