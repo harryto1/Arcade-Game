@@ -213,13 +213,14 @@ def restart():
     build_obstacles()
 
 def next_level():
-    global ball_speed_x, ball_speed_y, score, started
+    global ball_speed_x, ball_speed_y, score, started, key_on
     pygame.time.wait(750)
     ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
     ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
     score = 0  # Reset player score
     started = 0 # Reset started
     build_obstacles()
+    key_on = True
 
 # General setup
 pygame.mixer.pre_init(44100, -16, 1, 1024)
@@ -255,6 +256,7 @@ player_speed = 0
 started = 0
 level = 1
 obstacles = []
+key_on = True
 
 # Music Files
 
@@ -279,7 +281,8 @@ while True:
         main_loop_level3()
     # Game Logic
     ball_movement()
-    player_movement()
+    if key_on:
+        player_movement()
     temp_var = 0
     # Visuals
     screen.fill(bg_color)  # Clear screen with background color
@@ -299,6 +302,7 @@ while True:
             you_win_text_rect = you_win_text.get_rect(center=(screen_width / 2, screen_height / 2))
             screen.blit(you_win_text, you_win_text_rect)
             pygame.display.update()
+            key_on = False
             pygame.time.wait(2000)
             level = 2
             next_level()
@@ -307,6 +311,7 @@ while True:
             you_win_text_rect = you_win_text.get_rect(center=(screen_width / 2, screen_height / 2))
             screen.blit(you_win_text, you_win_text_rect)
             pygame.display.update()
+            key_on = False
             pygame.time.wait(2000)
             level = 3
             next_level()
